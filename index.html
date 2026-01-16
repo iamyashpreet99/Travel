@@ -1,180 +1,600 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Travel Buddy Finder</title>
+  <title>Thai Circle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <!-- React (UMD) -->
   <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script crossorigin
+    src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #0ea5e9;
+      --primary-dark: #0284c7;
+      --secondary: #6366f1;
+      --accent: #f43f5e;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Background Slideshow */
+    .bg-slideshow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      animation: fadeSlide 15s infinite;
+    }
+
+    .bg-slide:nth-child(1) {
+      background-image: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?q=80&w=2560&auto=format&fit=crop');
+      animation-delay: 0s;
+    }
+
+    .bg-slide:nth-child(2) {
+      background-image: url('https://images.unsplash.com/photo-1508009603885-50cf7c579365?q=80&w=2560&auto=format&fit=crop');
+      animation-delay: 5s;
+    }
+
+    .bg-slide:nth-child(3) {
+      background-image: url('https://images.unsplash.com/photo-1528181304800-259b08848526?q=80&w=2560&auto=format&fit=crop');
+      animation-delay: 10s;
+    }
+
+    .bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    @keyframes fadeSlide {
+      0% {
+        opacity: 0;
+        transform: scale(1);
+      }
+
+      5% {
+        opacity: 1;
+      }
+
+      33% {
+        opacity: 1;
+      }
+
+      38% {
+        opacity: 0;
+        transform: scale(1.05);
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-                   'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-      background: linear-gradient(135deg, #9333ea 0%, #ec4899 50%, #f97316 100%);
+      font-family: 'Outfit', sans-serif;
       min-height: 100vh;
-      padding: 1rem;
+      padding: 2rem 1rem;
+      color: var(--text-main);
     }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .card {
-      background: white; border-radius: 1rem;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-      padding: 1.5rem; margin-bottom: 1.5rem;
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
     }
+
     .header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 3rem;
+      gap: 1.5rem;
+      text-align: center;
     }
-    .title-container { display: flex; align-items: center; gap: 0.75rem; }
-    h1 { font-size: 1.875rem; font-weight: 700; color: #1f2937; }
+
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+
     .btn {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.75rem 1.5rem; border-radius: 0.5rem;
-      font-weight: 600; cursor: pointer; border: none; transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 1rem;
+      backdrop-filter: blur(8px);
     }
-    .btn-primary { background: #9333ea; color: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    .btn-primary:hover { background: #7e22ce; }
-    .btn-secondary { background: #d1d5db; color: #374151; }
-    .btn-secondary:hover { background: #9ca3af; }
-    .btn-sm { padding: 0.5rem; }
+
+    .btn-primary {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--primary-dark);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      background: white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
     .form-container {
-      background: #faf5ff; padding: 1.5rem; border-radius: 0.75rem;
-      border: 2px solid #e9d5ff; margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      padding: 2.5rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+      animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .form-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem; }
-    .form-group { margin-bottom: 1rem; }
-    label { display:block; font-size:0.875rem; font-weight:600; color:#374151; margin-bottom:0.5rem; }
-    input, select {
-      width: 100%; padding: 0.5rem 1rem; border: 2px solid #e9d5ff;
-      border-radius: 0.5rem; font-size: 1rem;
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    input:focus, select:focus { outline: none; border-color: #9333ea; }
-    .city-row { background:white; padding:1rem; border-radius:0.5rem; border:2px solid #e9d5ff; margin-bottom:0.75rem; }
-    .city-grid { display:grid; grid-template-columns:1fr; gap:0.75rem; margin-bottom:0.75rem; }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--text-main);
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      margin-left: 0.5rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: 1px solid transparent;
+      border-radius: 9999px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border-color: var(--primary);
+    }
+
+    .city-row {
+      background: rgba(255, 255, 255, 0.5);
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-bottom: 1rem;
+    }
+
+    .city-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
     @media (min-width: 768px) {
-      .city-grid { grid-template-columns: 1fr 1fr 1fr; }
-      h1 { font-size: 1.875rem; }
+      .city-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
     }
-    .city-row-container { display:flex; gap:0.75rem; align-items:start; }
-    .city-row-container > div:first-child { flex:1; }
+
+    .city-row-container {
+      display: flex;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .city-row-container>div:first-child {
+      flex: 1;
+    }
+
     .btn-add-city {
-      color:#9333ea; font-weight:600; margin-top:0.75rem;
-      background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:0.5rem;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      transition: background 0.2s;
     }
-    .btn-add-city:hover { color:#7e22ce; }
-    .btn-group { display:flex; gap:0.75rem; margin-top:1rem; }
-    .empty-state { text-align:center; padding:3rem 1.5rem; }
-    .empty-icon { width:64px; height:64px; margin:0 auto 1rem; }
-    .empty-title { font-size:1.25rem; font-weight:600; color:#4b5563; margin-bottom:0.5rem; }
-    .empty-text { color:#6b7280; }
+
+    .btn-add-city:hover {
+      background: rgba(14, 165, 233, 0.1);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: center;
+    }
+
     .traveler-card {
-      background:white; border-radius:0.75rem; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);
-      padding:1.5rem; margin-bottom:1.5rem; transition: box-shadow 0.3s;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
-    .traveler-card:hover { box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
-    .traveler-header { display:flex; justify-content:space-between; align-items:start; margin-bottom:1rem; }
-    .traveler-name { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; }
-    .traveler-interests { color:#4b5563; margin-bottom:0.75rem; }
-    .action-buttons { display:flex; gap:0.5rem; }
-    .btn-icon { background:none; border:none; cursor:pointer; padding:0.5rem; transition: color 0.3s; }
-    .btn-edit { color:#3b82f6; }
-    .btn-edit:hover { color:#1d4ed8; }
-    .btn-delete { color:#ef4444; }
-    .btn-delete:hover { color:#b91c1c; }
-    .city-card { background:#f9fafb; padding:1rem; border-radius:0.5rem; border:1px solid #e5e7eb; margin-bottom:1rem; }
-    .city-name { display:flex; align-items:center; gap:0.5rem; color:#9333ea; font-weight:600; font-size:1.125rem; margin-bottom:0.5rem; }
-    .city-dates { display:flex; align-items:center; gap:0.5rem; color:#4b5563; margin-bottom:0.75rem; font-size:0.875rem; }
-    .overlap-container { background:#f0fdf4; border:2px solid #bbf7d0; border-radius:0.5rem; padding:0.75rem; margin-top:0.75rem; }
-    .overlap-header { font-weight:600; color:#166534; margin-bottom:0.5rem; font-size:0.875rem; display:flex; align-items:center; gap:0.5rem; }
-    .overlap-item { background:white; padding:0.5rem; border-radius:0.375rem; border:1px solid #bbf7d0; margin-bottom:0.5rem; }
-    .overlap-item:last-child { margin-bottom:0; }
-    .overlap-name-date { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; }
-    .overlap-name { font-weight:600; color:#1f2937; font-size:0.875rem; }
-    .overlap-dates { font-size:0.75rem; color:#4b5563; }
-    .overlap-interests { font-size:0.75rem; color:#4b5563; }
-    .footer { background: rgba(255,255,255,0.9); border-radius:0.75rem; padding:1rem; text-align:center; font-size:0.875rem; color:#4b5563; }
-    .footer p { margin-bottom:0.5rem; }
-    .footer p:last-child { margin-bottom:0; }
-    svg { width:20px; height:20px; }
-    .icon-sm { width:16px; height:16px; }
-    .icon-lg { width:64px; height:64px; }
-    .status-line { margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem; }
+
+    .traveler-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .traveler-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1.25rem;
+    }
+
+    .traveler-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--text-main);
+    }
+
+    .traveler-interests {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: rgba(0, 0, 0, 0.05);
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 0.75rem;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: rgba(0, 0, 0, 0.1);
+      color: var(--text-main);
+    }
+
+    .city-card {
+      background: rgba(248, 250, 252, 0.5);
+      padding: 1rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      margin-bottom: 0.75rem;
+    }
+
+    .city-name {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-dark);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .city-dates {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .overlap-container {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .overlap-header {
+      font-weight: 600;
+      color: #15803d;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .overlap-item {
+      background: white;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      border: 1px solid #bbf7d0;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer {
+      margin-top: 4rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      display: inline-block;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer p {
+      margin-bottom: 0.25rem;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .icon-sm {
+      width: 16px;
+      height: 16px;
+    }
+
+    .icon-lg {
+      width: 64px;
+      height: 64px;
+    }
+
+    .status-line {
+      margin-top: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      text-align: center;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      .header {
+        margin-bottom: 2rem;
+      }
+
+      .form-container {
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+      }
+
+      .city-row {
+        padding: 1rem;
+      }
+
+      .city-grid {
+        gap: 0.75rem;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .btn-group {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .footer {
+        width: 90%;
+        padding: 1rem;
+        font-size: 0.85rem;
+      }
+
+      .traveler-card {
+        padding: 1.5rem;
+      }
+
+      .traveler-header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .action-buttons {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
   </style>
 
   <!-- Firebase Firestore (Module) -->
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    doc,
-    updateDoc,
-    deleteDoc,
-    onSnapshot,
-    query,
-    orderBy,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      doc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-  // Your config (keep as-is)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzhZTRzOYU6h6AY3ChT7Gg97EyFD5wfi4",
-    authDomain: "thailand-9c504.firebaseapp.com",
-    projectId: "thailand-9c504",
-    storageBucket: "thailand-9c504.firebasestorage.app",
-    messagingSenderId: "837514191642",
-    appId: "1:837514191642:web:69d068b4024c659dffc2a3",
-    measurementId: "G-4W98BY2T98"
-  };
-
-  try {
-    console.log("[Firebase] Starting init...");
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const travelersCol = collection(db, "travelers");
-
-    window.dbApi = {
-      listenTravelers: (cb, onError) => {
-        const q = query(travelersCol, orderBy("createdAt", "desc"));
-        return onSnapshot(
-          q,
-          (snap) => cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
-          (err) => onError && onError(err)
-        );
-      },
-      addTraveler: (payload) =>
-        addDoc(travelersCol, {
-          ...payload,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        }),
-      updateTraveler: (id, payload) =>
-        updateDoc(doc(db, "travelers", id), {
-          ...payload,
-          updatedAt: serverTimestamp()
-        }),
-      deleteTraveler: (id) => deleteDoc(doc(db, "travelers", id))
+    // Your config (keep as-is)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzhZTRzOYU6h6AY3ChT7Gg97EyFD5wfi4",
+      authDomain: "thailand-9c504.firebaseapp.com",
+      projectId: "thailand-9c504",
+      storageBucket: "thailand-9c504.firebasestorage.app",
+      messagingSenderId: "837514191642",
+      appId: "1:837514191642:web:69d068b4024c659dffc2a3",
+      measurementId: "G-4W98BY2T98"
     };
 
-    // Ready flag (so React can wait safely)
-    window.firebaseReady = true;
+    try {
+      console.log("[Firebase] Starting init...");
 
-    console.log("[Firebase] Ready. dbApi attached:", window.dbApi);
-  } catch (err) {
-    window.firebaseReady = false;
-    window.firebaseInitError = err;
-    console.error("[Firebase] Init failed:", err);
-  }
-</script>
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const travelersCol = collection(db, "travelers");
+
+      window.dbApi = {
+        listenTravelers: (cb, onError) => {
+          const q = query(travelersCol, orderBy("createdAt", "desc"));
+          return onSnapshot(
+            q,
+            (snap) => cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+            (err) => onError && onError(err)
+          );
+        },
+        addTraveler: (payload) =>
+          addDoc(travelersCol, {
+            ...payload,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          }),
+        updateTraveler: (id, payload) =>
+          updateDoc(doc(db, "travelers", id), {
+            ...payload,
+            updatedAt: serverTimestamp()
+          }),
+        deleteTraveler: (id) => deleteDoc(doc(db, "travelers", id))
+      };
+
+      // Ready flag (so React can wait safely)
+      window.firebaseReady = true;
+
+      console.log("[Firebase] Ready. dbApi attached:", window.dbApi);
+    } catch (err) {
+      window.firebaseReady = false;
+      window.firebaseInitError = err;
+      console.error("[Firebase] Init failed:", err);
+    }
+  </script>
 
 </head>
 
 <body>
+  <div class="bg-slideshow">
+    <div class="bg-slide"></div>
+    <div class="bg-slide"></div>
+    <div class="bg-slide"></div>
+    <div class="bg-overlay"></div>
+  </div>
   <div id="root"></div>
 
   <script>
@@ -223,17 +643,17 @@
     };
 
     function waitForDbApi(maxMs) {
-  const start = Date.now();
-  return new Promise((resolve, reject) => {
-    const tick = () => {
-      if (window.firebaseInitError) return reject(window.firebaseInitError);
-      if (window.firebaseReady && window.dbApi) return resolve(window.dbApi);
-      if (Date.now() - start > maxMs) return reject(new Error("Firebase did not become ready in time."));
-      setTimeout(tick, 50);
-    };
-    tick();
-  });
-}
+      const start = Date.now();
+      return new Promise((resolve, reject) => {
+        const tick = () => {
+          if (window.firebaseInitError) return reject(window.firebaseInitError);
+          if (window.firebaseReady && window.dbApi) return resolve(window.dbApi);
+          if (Date.now() - start > maxMs) return reject(new Error("Firebase did not become ready in time."));
+          setTimeout(tick, 50);
+        };
+        tick();
+      });
+    }
 
 
     function TravelOverlapApp() {
@@ -380,8 +800,8 @@
           const cities = traveler.cities || [];
           cities.forEach(tc => {
             if (tc.city === city &&
-                new Date(tc.startDate) <= end &&
-                new Date(tc.endDate) >= start) {
+              new Date(tc.startDate) <= end &&
+              new Date(tc.endDate) >= start) {
               overlaps.push({
                 name: traveler.name,
                 interests: traveler.interests,
@@ -415,22 +835,22 @@
       return e('div', { className: 'container' },
         e('div', { className: 'card' },
           e('div', { className: 'header' },
-  e('div', { className: 'title-container' },
-    e(Icons.Users),
-    e('h1', null, 'Travel Buddy Finder')
-  ),
-  e('button', {
-    className: 'btn btn-primary',
-    onClick: () => {
-      setEditingId(null);
-      setFormData({ name: '', interests: '', cities: [{ city: '', startDate: '', endDate: '' }] });
-      setShowForm(!showForm);
-    }
-  },
-    e(Icons.Plus),
-    'Add My Trips'
-  )
-),
+            e('div', { className: 'title-container' },
+              e(Icons.Users),
+              e('h1', null, 'Thai Circle')
+            ),
+            e('button', {
+              className: 'btn btn-primary',
+              onClick: () => {
+                setEditingId(null);
+                setFormData({ name: '', interests: '', cities: [{ city: '', startDate: '', endDate: '' }] });
+                setShowForm(!showForm);
+              }
+            },
+              e(Icons.Plus),
+              'Add My Trips'
+            )
+          ),
 
 
           loading && e('div', { className: 'status-line' }, 'Loading shared data from Firestore...'),
@@ -576,4 +996,5 @@
     ReactDOM.render(React.createElement(TravelOverlapApp), document.getElementById('root'));
   </script>
 </body>
+
 </html>
