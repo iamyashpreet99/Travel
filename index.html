@@ -106,63 +106,71 @@
 
   <!-- Firebase Firestore (Module) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      doc,
-      updateDoc,
-      deleteDoc,
-      onSnapshot,
-      query,
-      orderBy,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    try {
+      console.log("[Firebase] Module script starting...");
 
-    // IMPORTANT: Paste your Firebase Web App config here (from Firebase Console)
-    const firebaseConfig = {
-       apiKey: "AIzaSyBzhZTRzOYU6h6AY3ChT7Gg97EyFD5wfi4",
-  authDomain: "thailand-9c504.firebaseapp.com",
-  projectId: "thailand-9c504",
-  storageBucket: "thailand-9c504.firebasestorage.app",
-  messagingSenderId: "837514191642",
-  appId: "1:837514191642:web:69d068b4024c659dffc2a3",
-  measurementId: "G-4W98BY2T98"
-    };
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        doc,
+        updateDoc,
+        deleteDoc,
+        onSnapshot,
+        query,
+        orderBy,
+        serverTimestamp
+      } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const travelersCol = collection(db, "travelers");
+      // Config (yours)
+      const firebaseConfig = {
+        apiKey: "AIzaSyBzhZTRzOYU6h6AY3ChT7Gg97EyFD5wfi4",
+        authDomain: "thailand-9c504.firebaseapp.com",
+        projectId: "thailand-9c504",
+        storageBucket: "thailand-9c504.firebasestorage.app",
+        messagingSenderId: "837514191642",
+        appId: "1:837514191642:web:69d068b4024c659dffc2a3",
+        measurementId: "G-4W98BY2T98"
+      };
 
-    // Bridge for non-module script:
-    window.dbApi = {
-      listenTravelers: (cb, onError) => {
-        const q = query(travelersCol, orderBy("createdAt", "desc"));
-        return onSnapshot(
-          q,
-          (snap) => {
-            const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            cb(rows);
-          },
-          (err) => {
-            if (onError) onError(err);
-          }
-        );
-      },
-      addTraveler: (payload) =>
-        addDoc(travelersCol, {
-          ...payload,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        }),
-      updateTraveler: (id, payload) =>
-        updateDoc(doc(db, "travelers", id), {
-          ...payload,
-          updatedAt: serverTimestamp()
-        }),
-      deleteTraveler: (id) => deleteDoc(doc(db, "travelers", id))
-    };
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const travelersCol = collection(db, "travelers");
+
+      window.dbApi = {
+        listenTravelers: (cb, onError) => {
+          const q = query(travelersCol, orderBy("createdAt", "desc"));
+          return onSnapshot(
+            q,
+            (snap) => {
+              const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+              cb(rows);
+            },
+            (err) => {
+              if (onError) onError(err);
+            }
+          );
+        },
+        addTraveler: (payload) =>
+          addDoc(travelersCol, {
+            ...payload,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          }),
+        updateTraveler: (id, payload) =>
+          updateDoc(doc(db, "travelers", id), {
+            ...payload,
+            updatedAt: serverTimestamp()
+          }),
+        deleteTraveler: (id) => deleteDoc(doc(db, "travelers", id))
+      };
+
+      console.log("[Firebase] Initialized OK. window.dbApi ready:", window.dbApi);
+    } catch (e) {
+      console.error("[Firebase] Module init failed:", e);
+      window.firebaseInitError = e;
+    }
   </script>
 </head>
 
@@ -214,6 +222,19 @@
       )
     };
 
+    function waitForDbApi(maxMs) {
+      const start = Date.now();
+      return new Promise((resolve, reject) => {
+        const tick = () => {
+          if (window.dbApi) return resolve(window.dbApi);
+          if (window.firebaseInitError) return reject(window.firebaseInitError);
+          if (Date.now() - start > maxMs) return reject(new Error("Timed out waiting for Firebase module to initialize."));
+          setTimeout(tick, 50);
+        };
+        tick();
+      });
+    }
+
     function TravelOverlapApp() {
       const [travelers, setTravelers] = useState([]);
       const [showForm, setShowForm] = useState(false);
@@ -227,33 +248,40 @@
         cities: [{ city: '', startDate: '', endDate: '' }]
       });
 
-      // Realtime listener
       useEffect(() => {
-        if (!window.dbApi) {
-          setErrorMsg("Firestore not initialized. Check Firebase config block.");
-          setLoading(false);
-          return;
-        }
+        let unsubscribe = null;
 
-        const unsubscribe = window.dbApi.listenTravelers(
-          (rows) => {
-            const normalized = (rows || []).map(r => ({
-              id: r.id, // Firestore doc id (string)
-              name: r.name || "",
-              interests: r.interests || "",
-              cities: Array.isArray(r.cities) ? r.cities : []
-            }));
-            setTravelers(normalized);
-            setLoading(false);
-          },
-          (err) => {
-            console.error("Firestore listener error:", err);
-            setErrorMsg("Cannot read from Firestore. Check Firestore rules and that Firestore is created.");
+        (async () => {
+          try {
+            const dbApi = await waitForDbApi(8000);
+
+            unsubscribe = dbApi.listenTravelers(
+              (rows) => {
+                const normalized = (rows || []).map(r => ({
+                  id: r.id,
+                  name: r.name || "",
+                  interests: r.interests || "",
+                  cities: Array.isArray(r.cities) ? r.cities : []
+                }));
+                setTravelers(normalized);
+                setLoading(false);
+              },
+              (err) => {
+                console.error("Firestore listener error:", err);
+                setErrorMsg("Firestore error: " + (err?.message || String(err)));
+                setLoading(false);
+              }
+            );
+          } catch (err) {
+            console.error("Firebase init error:", err);
+            setErrorMsg("Firebase init failed: " + (err?.message || String(err)));
             setLoading(false);
           }
-        );
+        })();
 
-        return () => unsubscribe && unsubscribe();
+        return () => {
+          if (unsubscribe) unsubscribe();
+        };
       }, []);
 
       const addCityField = () => {
@@ -287,17 +315,17 @@
         }
 
         try {
-          if (!window.dbApi) throw new Error("dbApi missing");
+          const dbApi = await waitForDbApi(8000);
 
           if (editingId) {
-            await window.dbApi.updateTraveler(editingId, {
+            await dbApi.updateTraveler(editingId, {
               name: formData.name,
               interests: formData.interests,
               cities: validCities
             });
             setEditingId(null);
           } else {
-            await window.dbApi.addTraveler({
+            await dbApi.addTraveler({
               name: formData.name,
               interests: formData.interests,
               cities: validCities
@@ -308,7 +336,7 @@
           setShowForm(false);
         } catch (err) {
           console.error("Save failed:", err);
-          alert("Save failed. Check Firestore rules (test mode) and Firebase config.");
+          alert("Save failed: " + (err?.message || String(err)));
         }
       };
 
@@ -332,15 +360,14 @@
         if (!confirm('Are you sure you want to delete this entry?')) return;
 
         try {
-          if (!window.dbApi) throw new Error("dbApi missing");
-          await window.dbApi.deleteTraveler(id);
+          const dbApi = await waitForDbApi(8000);
+          await dbApi.deleteTraveler(id);
         } catch (err) {
           console.error("Delete failed:", err);
-          alert("Delete failed. Check Firestore rules.");
+          alert("Delete failed: " + (err?.message || String(err)));
         }
       };
 
-      // Updated: exclude current traveler by ID (names can be duplicates)
       const findOverlapsForCity = (travelerId, city, startDate, endDate) => {
         const start = new Date(startDate);
         const end = new Date(endDate);
