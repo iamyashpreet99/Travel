@@ -415,24 +415,23 @@
       return e('div', { className: 'container' },
         e('div', { className: 'card' },
           e('div', { className: 'header' },
-            e('div', { className: 'title-container' },
-              e(Icons.Users),
-              e('h1', null, 'Travel Buddy Finder')
-              e('div', { className: 'status-line' }, 'See who’s traveling where you are — in real time')
+  e('div', { className: 'title-container' },
+    e(Icons.Users),
+    e('h1', null, 'Travel Buddy Finder')
+  ),
+  e('button', {
+    className: 'btn btn-primary',
+    onClick: () => {
+      setEditingId(null);
+      setFormData({ name: '', interests: '', cities: [{ city: '', startDate: '', endDate: '' }] });
+      setShowForm(!showForm);
+    }
+  },
+    e(Icons.Plus),
+    'Add My Trips'
+  )
+),
 
-            ),
-            e('button', {
-              className: 'btn btn-primary',
-              onClick: () => {
-                setEditingId(null);
-                setFormData({ name: '', interests: '', cities: [{ city: '', startDate: '', endDate: '' }] });
-                setShowForm(!showForm);
-              }
-            },
-              e(Icons.Plus),
-              'Add My Trips'
-            )
-          ),
 
           loading && e('div', { className: 'status-line' }, 'Loading shared data from Firestore...'),
           errorMsg && e('div', { className: 'status-line', style: { color: '#b91c1c' } }, errorMsg),
