@@ -106,72 +106,72 @@
 
   <!-- Firebase Firestore (Module) -->
   <script type="module">
-    try {
-      console.log("[Firebase] Module script starting...");
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    doc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-      import {
-        getFirestore,
-        collection,
-        addDoc,
-        doc,
-        updateDoc,
-        deleteDoc,
-        onSnapshot,
-        query,
-        orderBy,
-        serverTimestamp
-      } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  // Your config (keep as-is)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzhZTRzOYU6h6AY3ChT7Gg97EyFD5wfi4",
+    authDomain: "thailand-9c504.firebaseapp.com",
+    projectId: "thailand-9c504",
+    storageBucket: "thailand-9c504.firebasestorage.app",
+    messagingSenderId: "837514191642",
+    appId: "1:837514191642:web:69d068b4024c659dffc2a3",
+    measurementId: "G-4W98BY2T98"
+  };
 
-      // Config (yours)
-      const firebaseConfig = {
-        apiKey: "AIzaSyBzhZTRzOYU6h6AY3ChT7Gg97EyFD5wfi4",
-        authDomain: "thailand-9c504.firebaseapp.com",
-        projectId: "thailand-9c504",
-        storageBucket: "thailand-9c504.firebasestorage.app",
-        messagingSenderId: "837514191642",
-        appId: "1:837514191642:web:69d068b4024c659dffc2a3",
-        measurementId: "G-4W98BY2T98"
-      };
+  try {
+    console.log("[Firebase] Starting init...");
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      const travelersCol = collection(db, "travelers");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const travelersCol = collection(db, "travelers");
 
-      window.dbApi = {
-        listenTravelers: (cb, onError) => {
-          const q = query(travelersCol, orderBy("createdAt", "desc"));
-          return onSnapshot(
-            q,
-            (snap) => {
-              const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-              cb(rows);
-            },
-            (err) => {
-              if (onError) onError(err);
-            }
-          );
-        },
-        addTraveler: (payload) =>
-          addDoc(travelersCol, {
-            ...payload,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-          }),
-        updateTraveler: (id, payload) =>
-          updateDoc(doc(db, "travelers", id), {
-            ...payload,
-            updatedAt: serverTimestamp()
-          }),
-        deleteTraveler: (id) => deleteDoc(doc(db, "travelers", id))
-      };
+    window.dbApi = {
+      listenTravelers: (cb, onError) => {
+        const q = query(travelersCol, orderBy("createdAt", "desc"));
+        return onSnapshot(
+          q,
+          (snap) => cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+          (err) => onError && onError(err)
+        );
+      },
+      addTraveler: (payload) =>
+        addDoc(travelersCol, {
+          ...payload,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }),
+      updateTraveler: (id, payload) =>
+        updateDoc(doc(db, "travelers", id), {
+          ...payload,
+          updatedAt: serverTimestamp()
+        }),
+      deleteTraveler: (id) => deleteDoc(doc(db, "travelers", id))
+    };
 
-      console.log("[Firebase] Initialized OK. window.dbApi ready:", window.dbApi);
-    } catch (e) {
-      console.error("[Firebase] Module init failed:", e);
-      window.firebaseInitError = e;
-    }
-  </script>
+    // Ready flag (so React can wait safely)
+    window.firebaseReady = true;
+
+    console.log("[Firebase] Ready. dbApi attached:", window.dbApi);
+  } catch (err) {
+    window.firebaseReady = false;
+    window.firebaseInitError = err;
+    console.error("[Firebase] Init failed:", err);
+  }
+</script>
+
 </head>
 
 <body>
@@ -223,17 +223,18 @@
     };
 
     function waitForDbApi(maxMs) {
-      const start = Date.now();
-      return new Promise((resolve, reject) => {
-        const tick = () => {
-          if (window.dbApi) return resolve(window.dbApi);
-          if (window.firebaseInitError) return reject(window.firebaseInitError);
-          if (Date.now() - start > maxMs) return reject(new Error("Timed out waiting for Firebase module to initialize."));
-          setTimeout(tick, 50);
-        };
-        tick();
-      });
-    }
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const tick = () => {
+      if (window.firebaseInitError) return reject(window.firebaseInitError);
+      if (window.firebaseReady && window.dbApi) return resolve(window.dbApi);
+      if (Date.now() - start > maxMs) return reject(new Error("Firebase did not become ready in time."));
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
 
     function TravelOverlapApp() {
       const [travelers, setTravelers] = useState([]);
